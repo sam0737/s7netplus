@@ -22,6 +22,11 @@ namespace S7.Net
         /// Ip address of the plc
         /// </summary>
         public string IP { get; private set; }
+        
+        /// <summary>
+        /// Port address of the plc
+        /// </summary>
+        public int Port { get; private set; }
 
         /// <summary>
         /// Cpu type of the plc
@@ -111,9 +116,10 @@ namespace S7.Net
         /// <param name="rack">rack of the plc, usually it's 0, but check in the hardware configuration of Step7 or TIA portal</param>
         /// <param name="slot">slot of the CPU of the plc, usually it's 2 for S7300-S7400, 0 for S7-1200 and S7-1500.
         ///  If you use an external ethernet card, this must be set accordingly.</param>
-        public Plc(CpuType cpu, string ip, Int16 rack, Int16 slot)
+        public Plc(CpuType cpu, string ip, int port, Int16 rack, Int16 slot)
         {
             IP = ip;
+            Port = port;
             CPU = cpu;
             Rack = rack;
             Slot = slot;
@@ -147,7 +153,7 @@ namespace S7.Net
                 _mSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 _mSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 1000);
                 _mSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, 1000);
-                IPEndPoint server = new IPEndPoint(IPAddress.Parse(IP), 102);
+                IPEndPoint server = new IPEndPoint(IPAddress.Parse(IP), Port);
                 _mSocket.Connect(server);
             }
             catch (Exception ex) {

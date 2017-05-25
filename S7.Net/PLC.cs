@@ -380,7 +380,16 @@ namespace S7.Net
             int cntBytes = VarTypeToByteLength(varType, varCount);
             byte[] bytes = ReadBytes(dataType, db, startByteAdr, cntBytes);
 
-            return ParseBytes(varType, bytes, varCount);
+            try
+            {
+                return ParseBytes(varType, bytes, varCount);
+            }
+            catch (Exception ex)
+            {
+                LastErrorCode = ErrorCode.ReadData;
+                LastErrorString = ex.Message;
+                return null;
+            }
         }
         
         /// <summary>
@@ -412,7 +421,7 @@ namespace S7.Net
                     case "DB":
                         string[] strings = txt.Split(new char[] { '.' });
                         if (strings.Length < 2)
-                            throw new Exception();
+                            throw new ArgumentException();
 
                         mDB = int.Parse(strings[0].Substring(2));
                         string dbType = strings[1].Substring(0, 3);
@@ -432,12 +441,12 @@ namespace S7.Net
                             case "DBX":
                                 mByte = dbIndex;
                                 mBit = int.Parse(strings[2]);
-                                if (mBit > 7) throw new Exception();
+                                if (mBit > 7) throw new ArgumentException();
                                 byte obj2 = (byte)Read(DataType.DataBlock, mDB, mByte, VarType.Byte, 1);
                                 objBoolArray = new BitArray(new byte[] { obj2 });
                                 return objBoolArray[mBit];
                             default:
-                                throw new Exception();
+                                throw new ArgumentException();
                         }
                     case "EB":
                         // Input byte
@@ -502,21 +511,21 @@ namespace S7.Net
                                 objUInt16 = (UInt16)Read(DataType.Counter, 0, int.Parse(txt.Substring(1)), VarType.Counter, 1);
                                 return objUInt16;
                             default:
-                                throw new Exception();
+                                throw new ArgumentException();
                         }
 
                         string txt2 = txt.Substring(1);
-                        if (txt2.IndexOf(".") == -1) throw new Exception();
+                        if (txt2.IndexOf(".") == -1) throw new ArgumentException();
 
                         mByte = int.Parse(txt2.Substring(0, txt2.IndexOf(".")));
                         mBit = int.Parse(txt2.Substring(txt2.IndexOf(".") + 1));
-                        if (mBit > 7) throw new Exception();
+                        if (mBit > 7) throw new ArgumentException();
                         var obj3 = (byte)Read(mDataType, 0, mByte, VarType.Byte, 1);
-                        objBoolArray = new BitArray(new byte[]{obj3});
+                        objBoolArray = new BitArray(new byte[] { obj3 });
                         return objBoolArray[mBit];
                 }
             }
-            catch 
+            catch (ArgumentException)
             {
                 LastErrorCode = ErrorCode.WrongVarFormat;
                 LastErrorString = "The variable'" + variable + "' could not be read. Please check the syntax and try again.";
@@ -1041,7 +1050,11 @@ namespace S7.Net
             {
                 case VarType.Byte:
                     if (varCount == 1)
+                    {
+                        if (bytes.Length < 1)
+                            throw new ArgumentException("Wrong number of bytes. Must at least contain 1 byte.");
                         return bytes[0];
+                    }
                     else
                         return bytes;
                 case VarType.Word:

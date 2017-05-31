@@ -1044,7 +1044,7 @@ namespace S7.Net
         /// <returns></returns>
         private object ParseBytes(VarType varType, byte[] bytes, int varCount)
         {
-            if (bytes == null) return null;
+            if (bytes == null) throw new ArgumentException("Cannot parse null bytes");
 
             switch (varType)
             {

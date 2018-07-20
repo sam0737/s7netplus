@@ -190,16 +190,16 @@ namespace S7.Net
 
                 switch (CPU) {
                     case CpuType.S7200:
-                        //S7200: Chr(193) & Chr(2) & Chr(16) & Chr(0) 'Eigener Tsap
+                        //S7200: Chr(193) & Chr(2) & Chr(3) & Chr(1) 'Eigener Tsap
                         bSend1[11] = 193;
                         bSend1[12] = 2;
-                        bSend1[13] = 16;
-                        bSend1[14] = 0;
-                        //S7200: Chr(194) & Chr(2) & Chr(16) & Chr(0) 'Fremder Tsap
+                        bSend1[13] = 0x03;
+                        bSend1[14] = 0x01;
+                        //S7200: Chr(194) & Chr(2) & Chr(3) & Chr(1) 'Fremder Tsap
                         bSend1[15] = 194;
                         bSend1[16] = 2;
-                        bSend1[17] = 16;
-                        bSend1[18] = 0;
+                        bSend1[17] = 0x03;
+                        bSend1[18] = 0x01;
                         break;
                     case CpuType.S71200:
                     case CpuType.S7300:
